@@ -12,7 +12,7 @@
 
 # Install
 
-- Edit the following file and add following code _/openedx/edx-platform/cms/djangoapps/contentstore/views/videos.py_
+- Edit the following file and add following code _/openedx/edx-platform/lms/djangoapps/discussion/signals/handlers.py_
 
         try:
             from eol_forum_notifications.views import send_notification_always_comment, send_notification_always_thread
