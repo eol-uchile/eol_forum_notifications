@@ -1,2 +1,2 @@
 def plugin_settings(settings):
-    pass
+    settings.EOL_FORUMS_NOTIFICATIONS_ENABLE = True

@@ -108,17 +108,16 @@ def send_notification(how_often):
             }
             task_send_email.delay(notification.discussion_id, context, content_forum, student_data[str(notification.user.id)] if str(notification.user.id) in student_data else {})
 
-def send_notification_always_thread(thread, user):
+def send_notification_always_thread(thread, user, current_site=None):
     """
         Send email with thread
     """
     from .tasks import task_send_single_email
-    try:
-        current_site = get_current_site()
+    if current_site is not None:
         platform_name =  current_site.configuration.get_value('PLATFORM_NAME', 'EOL')
         url_site =  current_site.configuration.get_value('LMS_BASE', 'eol.uchile.cl')
-    except Exception:
-        logger.error('EolForumNotification - Error to get platform name and url site')
+    else:
+        logger.error('EolForumNotification - current_site is None')
         platform_name =  'EOL'
         url_site = 'eol.uchile.cl'
     context = {
@@ -140,22 +139,20 @@ def send_notification_always_thread(thread, user):
         if notif.thread_created:
             task_send_single_email.delay(context, notif.user.id)
 
-def send_notification_always_comment(comment, user):
+def send_notification_always_comment(comment, user, current_site=None):
     """
         Send email with comment
     """
     from .tasks import task_send_single_email
-    try:
-        current_site = get_current_site()
+    if current_site is not None:
         platform_name =  current_site.configuration.get_value('PLATFORM_NAME', 'EOL')
         url_site =  current_site.configuration.get_value('LMS_BASE', 'eol.uchile.cl')
-    except Exception:
-        logger.error('EolForumNotification - Error to get platform name and url site')
+    else:
+        logger.error('EolForumNotification - current_site is None')
         platform_name =  'EOL'
         url_site = 'eol.uchile.cl'
     thread = comment.thread
     parent = None
-    
     context = {
         'course_id': str(thread.course_id),
         'comment_id': comment.id,

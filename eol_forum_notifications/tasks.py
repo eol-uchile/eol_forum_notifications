@@ -12,6 +12,7 @@ from django.template.loader import render_to_string
 from .models import EolForumNotifications
 from .utils import reduce_threads
 from django.utils.timezone import now
+from lms.djangoapps.courseware.courses import get_course_by_id
 import logging
 logger = logging.getLogger(__name__)
 
@@ -58,12 +59,17 @@ def task_send_email(discussion_id, context, content_forum, student_data):
     max_retries=EMAIL_MAX_RETRIES)
 def task_send_single_email(context, user_id):
     subject = 'Notificaciones Foro'
+    course = get_course_by_id(CourseKey.from_string(context['course_id']))
+    context['course_name'] = course.display_name_with_default
     user_notif = EolForumNotifications.objects.get(user__id=user_id, discussion_id=context['discussion_id'])
     emails = [user_notif.user.email]
     if context['type'] == 'thread':
-        html_message = render_to_string('eol_forum_notifications/email.txt', context)
+        html_message = render_to_string('eol_forum_notifications/thread.html', context)
     if context['type'] == 'comment':
-        html_message = render_to_string('eol_forum_notifications/email.txt', context)
+        if context['parent']:
+            html_message = render_to_string('eol_forum_notifications/sub_comment.html', context)
+        else:
+            html_message = render_to_string('eol_forum_notifications/comment.html', context)
     plain_message = strip_tags(html_message)
     from_email = configuration_helpers.get_value(
         'email_from_address',
