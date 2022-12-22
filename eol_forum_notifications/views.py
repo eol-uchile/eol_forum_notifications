@@ -170,13 +170,14 @@ def send_notification_always_comment(comment, user, current_site=None):
         'platform_name': platform_name,
         'url_site':url_site,
         'type': 'comment',
-        'parent': {}
+        'parent': False
     }
     if comment.parent_id is not None:
         parent = get_comment(comment.parent_id)
-        context['parent']['author_id'] = parent.user_id
-        context['parent']['author_username'] = parent.username
-        context['parent']['body'] = parent.body
+        context['parent'] = True
+        context['parent_author_id'] = parent.user_id
+        context['parent_author_username'] = parent.username
+        context['parent_body'] = parent.body
     users = EolForumNotifications.objects.filter(how_often='always', discussion_id=thread.commentable_id).exclude(user=user)
     for notif in users:
         if notif.comment_created or (notif.own_comment_created and check_own_comment(context, notif.user.id)):
