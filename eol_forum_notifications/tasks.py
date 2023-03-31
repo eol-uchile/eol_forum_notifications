@@ -9,10 +9,9 @@ from django.contrib.auth.models import User
 from opaque_keys.edx.keys import CourseKey, UsageKey
 from opaque_keys import InvalidKeyError
 from django.template.loader import render_to_string
-from .models import EolForumNotifications
-from .utils import reduce_threads
+from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
 from django.utils.timezone import now
-from lms.djangoapps.courseware.courses import get_course_by_id
+from datetime import timedelta
 import logging
 logger = logging.getLogger(__name__)
 
@@ -23,20 +22,10 @@ EMAIL_MAX_RETRIES = 5
     queue='edx.lms.core.low',
     default_retry_delay=EMAIL_DEFAULT_RETRY_DELAY,
     max_retries=EMAIL_MAX_RETRIES)
-def task_send_email(discussion_id, context, content_forum, student_data):
-    """
-        Send mail to specific user
-    """
-    subject = 'Notificaciones Resumen Foro'
-    user_notif = EolForumNotifications.objects.get(user__id=context['user_id'], discussion_id=discussion_id)
-    emails = [user_notif.user.email]
-    hilos = reduce_threads(discussion_id, context)
-    if hilos is None:
-        return None
-    context['hilos'] = hilos #can be None
-    context['content_forum'] = content_forum
-    context['student_data'] = student_data
-    html_message = render_to_string('eol_forum_notifications/email.txt', context)
+def task_send_single_email(discussion_id, course_id, context):
+    subject = 'Nueva actividad en el foro de {}'.format(context['platform_name'])
+    emails = [context['email']]
+    html_message = render_to_string('eol_forum_notifications/email.html', context)
     plain_message = strip_tags(html_message)
     from_email = configuration_helpers.get_value(
         'email_from_address',
@@ -49,39 +38,4 @@ def task_send_email(discussion_id, context, content_forum, student_data):
         emails,
         fail_silently=False,
         html_message=html_message)
-    user_notif.sent_at = now()
-    user_notif.save()
-    return mail
-
-@task(
-    queue='edx.lms.core.low',
-    default_retry_delay=EMAIL_DEFAULT_RETRY_DELAY,
-    max_retries=EMAIL_MAX_RETRIES)
-def task_send_single_email(context, user_id):
-    subject = 'Notificaciones Foro'
-    course = get_course_by_id(CourseKey.from_string(context['course_id']))
-    context['course_name'] = course.display_name_with_default
-    user_notif = EolForumNotifications.objects.get(user__id=user_id, discussion_id=context['discussion_id'])
-    emails = [user_notif.user.email]
-    if context['type'] == 'thread':
-        html_message = render_to_string('eol_forum_notifications/thread.html', context)
-    if context['type'] == 'comment':
-        if context['parent']:
-            html_message = render_to_string('eol_forum_notifications/sub_comment.html', context)
-        else:
-            html_message = render_to_string('eol_forum_notifications/comment.html', context)
-    plain_message = strip_tags(html_message)
-    from_email = configuration_helpers.get_value(
-        'email_from_address',
-        settings.BULK_EMAIL_DEFAULT_FROM_EMAIL
-    )
-    mail = send_mail(
-        subject,
-        plain_message,
-        from_email,
-        emails,
-        fail_silently=False,
-        html_message=html_message)
-    user_notif.sent_at = now()
-    user_notif.save()
     return mail

@@ -6,48 +6,52 @@
 # Install App
 
     docker-compose exec lms pip install -e /openedx/requirements/eol_forum_notifications
+    docker-compose exec lms_worker pip install -e /openedx/requirements/eol_forum_notifications
     docker-compose exec lms python manage.py lms --settings=prod.production makemigrations eol_forum_notifications
     docker-compose exec lms python manage.py lms --settings=prod.production migrate
+
+
+# Commands
+
+    > docker-compose exec lms python manage.py lms --settings=prod.production discussion_notification daily
+    > docker-compose exec lms python manage.py lms --settings=prod.production discussion_notification weekly
 
 
 # Install
 
 - Edit the following file and add following code _/openedx/edx-platform/lms/djangoapps/discussion/signals/handlers.py_
 
-        try:
-            from eol_forum_notifications.views import send_notification_always_comment, send_notification_always_thread
-            from eol_forum_notifications.models import EolForumNotifications
-            EOL_NOTIFICATION_ENABLED = True
-        except ImportError:
-            EOL_NOTIFICATION_ENABLED = False
-
         @receiver(signals.comment_created)
         def send_discussion_email_notification(sender, user, post, **kwargs):
-            if EOL_NOTIFICATION_ENABLED and EolForumNotifications.objects.filter(discussion_id=post.thread.commentable_id).exists():
-                send_notification_always_comment(post, user)
-            else:
-                current_site = get_current_site()
-                if current_site is None:
-                    log.info(u'Discussion: No current site, not sending notification about post: %s.', post.id)
-                    return
-
+            with transaction.atomic():
                 try:
-                    if not current_site.configuration.get_value(ENABLE_FORUM_NOTIFICATIONS_FOR_SITE_KEY, False):
-                        log_message = u'Discussion: notifications not enabled for site: %s. Not sending message about post: %s.'
-                        log.info(log_message, current_site, post.id)
-                        return
-                except SiteConfiguration.DoesNotExist:
-                    log_message = u'Discussion: No SiteConfiguration for site %s. Not sending message about post: %s.'
-                    log.info(log_message, current_site, post.id)
-                    return
-
-                send_message(post, current_site)
-            return
+                    from eol_forum_notifications.models import EolForumNotificationsDiscussions
+                    discussion = EolForumNotificationsDiscussions.objects.get(discussion_id=post.thread.commentable_id, course_id=post.thread.course_id)
+                    discussion.daily_comment += 1
+                    discussion.weekly_comment += 1
+                    discussion.save()
+                except Exception as e:
+                    log.info("EolForumNotifications - Error to increment comment count. discussion_id: {}, course: {}, error: {}".format(
+                        post.thread.commentable_id,
+                        post.thread.course_id,
+                        str(e)))
+           
+                return
 
         @receiver(signals.thread_created)
-        def eol_send_thread_created(sender, user, post, **kwargs):
-            if EOL_NOTIFICATION_ENABLED:
-                send_notification_always_thread(post, user)
+        def eol_thread_created(sender, user, post, **kwargs):
+            with transaction.atomic():
+                try:
+                    from eol_forum_notifications.models import EolForumNotificationsDiscussions
+                    discussion = EolForumNotificationsDiscussions.objects.get(discussion_id=post.commentable_id, course_id=post.course_id)
+                    discussion.daily_threads += 1
+                    discussion.weekly_threads += 1
+                    discussion.save()
+                except Exception as e:
+                    log.info("EolForumNotifications - Error to increment comment count. discussion_id: {}, course: {}, error: {}".format(
+                        post.commentable_id,
+                        post.course_id,
+                        str(e)))
             return
 
 ## TESTS

@@ -1,4 +1,0 @@
-## mako
-<html>
-Correo de prueba
-</html>

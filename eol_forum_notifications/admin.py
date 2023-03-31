@@ -1,9 +1,15 @@
 from django.contrib import admin
-from .models import EolForumNotifications
+from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
 # Register your models here.
-class EolForumNotificationsAdmin(admin.ModelAdmin):
-    raw_id_fields = ('user',)
-    list_display = ('user', 'discussion_id', 'course_id')
-    search_fields = ['user__username', 'discussion_id', 'course_id']
 
-admin.site.register(EolForumNotifications, EolForumNotificationsAdmin)
+class EolForumNotificationsDiscussionsAdmin(admin.ModelAdmin):
+    list_display = ('discussion_id', 'course_id', 'daily_threads', 'daily_comment', 'weekly_threads', 'weekly_comment')
+    search_fields = ['discussion_id', 'course_id', 'daily_threads', 'daily_comment', 'weekly_threads', 'weekly_comment']
+
+class EolForumNotificationsUserAdmin(admin.ModelAdmin):
+    raw_id_fields = ('user', 'discussion')
+    list_display = ('user', 'discussion', 'how_often')
+    search_fields = ['user__username', 'discussion', 'how_often']
+
+admin.site.register(EolForumNotificationsDiscussions, EolForumNotificationsDiscussionsAdmin)
+admin.site.register(EolForumNotificationsUser, EolForumNotificationsUserAdmin)
