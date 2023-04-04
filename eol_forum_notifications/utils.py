@@ -71,6 +71,9 @@ def get_users_notifications(how_often, discussion_id, course_id):
     return list(notifications)
 
 def get_courses_onlive():
+    """
+        get all courses onlive (not archived)
+    """
     courses = EolForumNotificationsDiscussions.objects.all().values('course_id').distinct()
     course_data = {}
     for c in courses:
@@ -108,6 +111,9 @@ def get_user_data(discussion_id, user, course_key, block_key):
         return '{}'
 
 def get_block_info(block_key):
+    """
+        get displat name and parent id from block_key
+    """
     store = modulestore()
     default = 'Discusión'
     try:
@@ -123,3 +129,20 @@ def get_block_info(block_key):
                 'display_name': default,
                 'parent': ''
             }
+
+def get_info_block_course(discussion_id, course_id):
+    """
+        get course and discussion display_name
+    """
+    try:
+        course_key = CourseKey.from_string(course_id)
+        discussion = EolForumNotificationsDiscussions.objects.get(discussion_id=discussion_id, course_id=course_key)
+        block_info = get_block_info(discussion.block_key)
+        course = get_course_by_id(course_key)
+        return {
+            'course_name': course.display_name_with_default,
+            'discussion_name': block_info['display_name']
+        }
+    except Exception as e:
+        logger.info('EolForumNotification - Error to get block and course data, course id: {}, discussion_id: {}'.format(course_id, discussion_id))
+        return None

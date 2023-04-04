@@ -42,12 +42,11 @@
                         <tr>
                             <td>
                                 <div style="width: 100%;text-align: center;margin-top: 5px;">
-                                    <!--img src="{{url_site}}{{image}}" height="40" width="30" /-->
-                                    <img src="https://eol.uchile.cl/asset-v1:eol+C1+2022_1+type@asset+block@portada_2022_01.jpg"  width="450">
+                                    <img src="{{url_site}}{{image}}" width="450" />
                                 </div>
                             </td>
                         </tr>
-                        <tr style="margin-top: 10px;display: block;padding-left: 34px;padding-right: 34px;">
+                        <tr style="margin-top: 5px;display: block;padding-left: 34px;padding-right: 34px;">
                             <td>
                                 <p style="color: #838383;">
                                     {% if how_often == "daily" %}
@@ -70,11 +69,11 @@
                                 </p>
                                 <p>
                                     <a href="{{url_site}}/courses/{{course_id}}/jump_to/{{parent}}" style="color:#ffffff;text-decoration:none;border-radius:4px;background-color:#7eb0d5;border-top:7px solid #7eb0d5;border-bottom:7px solid #7eb0d5;border-right:60px solid #7eb0d5;border-left:60px solid #7eb0d5;display:inline-block" target="_blank" >
-                                        <font color="#ffffff"><b>Ver discusion</b></font>
+                                        <font color="#ffffff"><b>Ver discusión</b></font>
                                     </a>
                                 </p>
                                 <p style="color: #838383;">
-                                    Para realizar cambios en las notificaciones revisa el siguiente <a href="{{url_site}}/courses/{{course_id}}/jump_to/{{parent}}" style="color: #7eb0d5;"><b>link</b></a>
+                                    Para realizar cambios en las notificaciones revisa el siguiente <a href="{{notif_url}}" style="color: #7eb0d5;"><b>link</b></a>
                                 </p>
                             </td>
                         </tr>
