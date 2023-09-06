@@ -189,15 +189,15 @@ def send_notification(how_often):
                 context.update(discussion)
                 context.pop('block_key')
                 task_send_single_email.delay(discussion['discussion_id'], course, context)
-        logger.info('EolForumNotification - emails sent, how_often: {}'.format(how_often))
-        with transaction.atomic():
-            discussion_model = EolForumNotificationsDiscussions.objects.get(discussion_id=discussion['discussion_id'], course_id=CourseKey.from_string(course))
-            if how_often == 'daily':
-                discussion_model.daily_threads = 0
-                discussion_model.daily_comment = 0
-            else:
-                discussion_model.weekly_threads = 0
-                discussion_model.weekly_comment = 0
-            discussion_model.save()
-            logger.info('EolForumNotification - {} threads/comment count reset, course: {}'.format(how_often, course))
+            logger.info('EolForumNotification - emails sent, how_often: {}'.format(how_often))
+            with transaction.atomic():
+                discussion_model = EolForumNotificationsDiscussions.objects.get(discussion_id=discussion['discussion_id'], course_id=CourseKey.from_string(course))
+                if how_often == 'daily':
+                    discussion_model.daily_threads = 0
+                    discussion_model.daily_comment = 0
+                else:
+                    discussion_model.weekly_threads = 0
+                    discussion_model.weekly_comment = 0
+                discussion_model.save()
+                logger.info('EolForumNotification - {} threads/comment count reset, course: {}, discussion_id: {}'.format(how_often, course, discussion['discussion_id']))
     

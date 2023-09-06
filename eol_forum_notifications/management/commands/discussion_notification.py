@@ -29,5 +29,3 @@ class Command(BaseCommand):
             raise CommandError("EolForumNoticationsCommand - how_often must be 'weekly' or 'daily'")
         how_often = options['how_often']
         send_notification(how_often)
-
-        return 

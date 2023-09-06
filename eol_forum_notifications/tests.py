@@ -211,7 +211,7 @@ class TestNotifiactionsDiscussion(UrlResetMixin, ModuleStoreTestCase):
     
     @override_settings(PLATFORM_NAME='Test')
     @override_settings(LMS_ROOT_URL='https://test.ts')
-    @patch('eol_forum_notifications.utils.get_block_info')
+    @patch('eol_forum_notifications.views.get_block_info')
     @patch('eol_forum_notifications.utils.course_image_url')
     @patch('eol_forum_notifications.utils.get_course_by_id')
     def test_send_notifications_daily(self, course_mock, image_mock, block_mock):
@@ -240,14 +240,16 @@ class TestNotifiactionsDiscussion(UrlResetMixin, ModuleStoreTestCase):
 
     @override_settings(PLATFORM_NAME='Test')
     @override_settings(LMS_ROOT_URL='https://test.ts')
+    @patch('eol_forum_notifications.views.get_block_info')
     @patch('eol_forum_notifications.utils.course_image_url')
     @patch('eol_forum_notifications.utils.get_course_by_id')
-    def test_send_notifications_weekly(self, course_mock, image_mock):
+    def test_send_notifications_weekly(self, course_mock, image_mock, block_mock):
         """
             test send_notifications() weekly period
         """
         course_mock.side_effect = [namedtuple("Course", ["display_name_with_default", "end"])("this is a display name", None)]
         image_mock.return_value = '/assets/image.jpg'
+        block_mock.return_value = {'display_name':'Test discussion xblock', 'parent': 'asdadssa'}
         user_notif = EolForumNotificationsUser.objects.create(discussion=self.discussion, user=self.student, how_often="daily")
         self.discussion.daily_threads = 3
         self.discussion.daily_comment = 3
@@ -267,14 +269,16 @@ class TestNotifiactionsDiscussion(UrlResetMixin, ModuleStoreTestCase):
 
     @override_settings(PLATFORM_NAME='Test')
     @override_settings(LMS_ROOT_URL='https://test.ts')
+    @patch('eol_forum_notifications.views.get_block_info')
     @patch('eol_forum_notifications.utils.course_image_url')
     @patch('eol_forum_notifications.utils.get_course_by_id')
-    def test_send_notifications_daily_no_users(self, course_mock, image_mock):
+    def test_send_notifications_daily_no_users(self, course_mock, image_mock, block_mock):
         """
             test send_notifications() daily period when there isnt users
         """
         course_mock.side_effect = [namedtuple("Course", ["display_name_with_default", "end"])("this is a display name", None)]
         image_mock.return_value = '/assets/image.jpg'
+        block_mock.return_value = {'display_name':'Test discussion xblock', 'parent': 'asdadssa'}
         self.discussion.daily_threads = 3
         self.discussion.daily_comment = 3
         self.discussion.weekly_threads = 3
