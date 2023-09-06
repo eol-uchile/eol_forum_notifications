@@ -1,4 +1,4 @@
-# Eol User Data
+# Eol Forum Notifications
 
 ![https://github.com/eol-uchile/eol_forum_notifications/actions](https://github.com/eol-uchile/eol_forum_notifications/workflows/Python%20application/badge.svg)
 
