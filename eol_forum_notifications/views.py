@@ -148,9 +148,6 @@ def send_notification(how_often):
         Send email with threads and/or comments unreaded
     """
     from .tasks import task_send_single_email
-    delta = 7 # how_often = weekly
-    if how_often == 'daily':
-        delta = 1
     try:
         current_site = get_current_site()
         platform_name =  current_site.configuration.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
@@ -164,6 +161,9 @@ def send_notification(how_often):
         for discussion in courses_data[course]['discussions']:
             users_notifications = get_users_notifications(how_often, discussion['discussion_id'], course)
             block = get_block_info(discussion['block_key'])
+            if block['parent'] == "":
+                logger.info('EolForumNotification - Block id doesnt exists, {}, course: {}'.format(discussion['block_key'], course))
+                continue
             for user in users_notifications:
                 context = {
                     'user_id':user['user__id'],
@@ -189,6 +189,7 @@ def send_notification(how_often):
                 context.update(discussion)
                 context.pop('block_key')
                 task_send_single_email.delay(discussion['discussion_id'], course, context)
+        logger.info('EolForumNotification - emails sent, how_often: {}'.format(how_often))
         with transaction.atomic():
             discussion_model = EolForumNotificationsDiscussions.objects.get(discussion_id=discussion['discussion_id'], course_id=CourseKey.from_string(course))
             if how_often == 'daily':
@@ -198,4 +199,5 @@ def send_notification(how_often):
                 discussion_model.weekly_threads = 0
                 discussion_model.weekly_comment = 0
             discussion_model.save()
+            logger.info('EolForumNotification - {} threads/comment count reset, course: {}'.format(how_often, course))
     

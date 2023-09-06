@@ -9,7 +9,7 @@ class EolForumNotificationsDiscussionsAdmin(admin.ModelAdmin):
 class EolForumNotificationsUserAdmin(admin.ModelAdmin):
     raw_id_fields = ('user', 'discussion')
     list_display = ('user', 'discussion', 'how_often')
-    search_fields = ['user__username', 'discussion', 'how_often']
+    search_fields = ['user__username', 'discussion__course_id', 'how_often']
 
 admin.site.register(EolForumNotificationsDiscussions, EolForumNotificationsDiscussionsAdmin)
 admin.site.register(EolForumNotificationsUser, EolForumNotificationsUserAdmin)

@@ -8,7 +8,7 @@
     docker-compose exec lms pip install -e /openedx/requirements/eol_forum_notifications
     docker-compose exec lms_worker pip install -e /openedx/requirements/eol_forum_notifications
     docker-compose exec lms python manage.py lms --settings=prod.production makemigrations eol_forum_notifications
-    docker-compose exec lms python manage.py lms --settings=prod.production migrate
+    docker-compose exec lms python manage.py lms --settings=prod.production migrate eol_forum_notifications
 
 
 # Commands
