@@ -1,30 +1,19 @@
 # -*- coding: utf-8 -*-
 
-
-from mock import patch, Mock, PropertyMock
+from mock import patch
 from collections import namedtuple
-
-import json
-
-from django.test import TestCase, Client
+from django.test import Client
 from django.urls import reverse
 
 from common.djangoapps.util.testing import UrlResetMixin
-from xmodule.modulestore import ModuleStoreEnum
 from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
 
 from xmodule.modulestore.tests.factories import CourseFactory
 from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
-from xblock.field_data import DictFieldData
-from opaque_keys.edx.keys import CourseKey
 from common.djangoapps.student.roles import CourseStaffRole
 from django.test.utils import override_settings
 from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
 from opaque_keys.edx.keys import UsageKey
-import urllib.parse
-from urllib.parse import parse_qs
-from datetime import timedelta
-from django.utils.timezone import now
 from .views import send_notification
 
 class TestRequest(object):
