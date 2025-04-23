@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
-
-from mock import patch
+# Python Standard Libraries
 from collections import namedtuple
+import json
+
+# Installed packages (via pip)
 from django.test import Client
-from django.urls import reverse
-
-from common.djangoapps.util.testing import UrlResetMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from xmodule.modulestore.tests.factories import CourseFactory
-from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
-from common.djangoapps.student.roles import CourseStaffRole
 from django.test.utils import override_settings
-from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
+from django.urls import reverse
+from mock import patch
+
+# Edx dependencies
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
+from common.djangoapps.util.testing import UrlResetMixin
 from opaque_keys.edx.keys import UsageKey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
+# Internal project dependencies
+from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
+from .utils import get_user_data, get_info_block_course
 from .views import send_notification
 
 class TestRequest(object):
@@ -463,3 +469,34 @@ class TestNotifiactionsDiscussion(UrlResetMixin, ModuleStoreTestCase):
         self.assertFalse(EolForumNotificationsUser.objects.filter(user=self.student, discussion=self.discussion).exists())
         self.assertEqual(response.status_code, 200)
         self.assertTrue("id=\"wrong_data\"" in response._container[0].decode())
+
+    def test_utils_get_user_data_non_existing_discussion_id(self):
+        """
+        Test error when discussion_id doesn't exist
+        """
+        notifications=get_user_data('test_id', self.student, self.course.id, self.block_key)
+        self.assertEqual(notifications, '{}')
+
+    def test_utils_get_user_data_wrong_user_id(self):
+        """
+        Test error when user in notification is different from request user
+        """
+        user_notif = EolForumNotificationsUser.objects.create(discussion=self.discussion, user=self.student, how_often="daily")
+        notifications=get_user_data('1234567890', self.student2, self.course.id, self.block_key)
+        self.assertEqual(notifications, '{}')
+
+    def test_utils_get_user_data(self):
+        """
+        Test get_user_data with expecting path
+        """
+        user_notif = EolForumNotificationsUser.objects.create(discussion=self.discussion, user=self.student, how_often="daily")
+        response=get_user_data('1234567890', self.student, self.course.id, self.block_key)
+        response_data = json.loads(response)
+        self.assertEqual(response_data['how_often'], 'daily')
+    
+    def test_utils_get_info_block_course_wrong_user_id(self):
+        """
+        Test error when user in notification is different from request user
+        """
+        info = get_info_block_course(self.discussion.id, 'course_test_wrong')
+        self.assertEqual(info, None)

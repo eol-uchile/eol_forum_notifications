@@ -1,24 +1,25 @@
 #!/usr/bin/env python
 # -- coding: utf-8 --
+# Python Standard Libraries
+from urllib.parse import urlencode
+import logging
+import uuid
 
+# Installed packages (via pip)
 from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.db import transaction
-from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404, HttpResponseNotFound
-from django.shortcuts import render
-from opaque_keys.edx.keys import CourseKey
-from django.urls import reverse
 from django.http import HttpResponse
-from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
-from urllib.parse import urlencode
+from django.http import HttpResponseNotFound
+from django.shortcuts import render
 from django.urls import reverse
+
+# Edx dependencies
+from opaque_keys.edx.keys import CourseKey
+
+# Internal project dependencies
+from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
 from .utils import get_users_notifications, get_courses_onlive, get_block_info, get_info_block_course
-import json
-import uuid
-import requests
-import logging
 
 logger = logging.getLogger(__name__)
 msg_error = "contáctese al correo eol-ayuda@uchile.cl adjuntando el número del error"

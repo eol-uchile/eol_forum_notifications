@@ -1,5 +1,7 @@
 # Eol Forum Notifications
 
+![Coverage Status](/coverage-badge.svg)
+
 ![https://github.com/eol-uchile/eol_forum_notifications/actions](https://github.com/eol-uchile/eol_forum_notifications/workflows/Python%20application/badge.svg)
 
 
@@ -57,5 +59,10 @@
 ## TESTS
 **Prepare tests:**
 
-    > cd .github/
-    > docker-compose run lms /openedx/requirements/eol_forum_notifications/.github/test.sh
+- Install **act** following the instructions in [https://nektosact.com/installation/index.html](https://nektosact.com/installation/index.html)
+
+**Run tests:**
+- In a terminal at the root of the project
+    ```
+    act -W .github/workflows/pythonapp.yml
+    ```

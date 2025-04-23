@@ -25,23 +25,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def check_own_comment(data, user_id):
-    """
-        check if author threar/comment is the same as the current user
-    """
-    if data['thread_author_id'] == user_id:
-        return True
-    if data['parent'] is not None and data['parent']['author_id'] == user_id:
-        return True
-    return False
-
-def get_comment(comment_id):
-    """
-        Return comment based on comment_id
-    """
-    comment = cc.Comment.find(id=comment_id).retrieve()
-    return comment
-
 def get_users_notifications(how_often, discussion_id, course_id):
     """
         return all user based on params
