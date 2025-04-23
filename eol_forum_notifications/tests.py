@@ -15,6 +15,8 @@ from django.test.utils import override_settings
 from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
 from opaque_keys.edx.keys import UsageKey
 from .views import send_notification
+from .utils import get_user_data
+import json
 
 class TestRequest(object):
     # pylint: disable=too-few-public-methods
@@ -463,3 +465,27 @@ class TestNotifiactionsDiscussion(UrlResetMixin, ModuleStoreTestCase):
         self.assertFalse(EolForumNotificationsUser.objects.filter(user=self.student, discussion=self.discussion).exists())
         self.assertEqual(response.status_code, 200)
         self.assertTrue("id=\"wrong_data\"" in response._container[0].decode())
+
+    def test_utils_get_user_data_non_existing_discussion_id(self):
+        """
+        Test error when discussion_id doesn't exist
+        """
+        notifications=get_user_data('test_id', self.student, self.course.id, self.block_key)
+        self.assertEqual(notifications, '{}')
+
+    def test_utils_get_user_data_wrong_user_id(self):
+        """
+        Test error when user in notification is different from request user
+        """
+        user_notif = EolForumNotificationsUser.objects.create(discussion=self.discussion, user=self.student, how_often="daily")
+        notifications=get_user_data('1234567890', self.student2, self.course.id, self.block_key)
+        self.assertEqual(notifications, '{}')
+
+    def test_utils_get_user_data(self):
+        """
+        Test get_user_data with expecting path
+        """
+        user_notif = EolForumNotificationsUser.objects.create(discussion=self.discussion, user=self.student, how_often="daily")
+        response=get_user_data('1234567890', self.student, self.course.id, self.block_key)
+        response_data = json.loads(response)
+        self.assertEqual(response_data['how_often'], 'daily')
