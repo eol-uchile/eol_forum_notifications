@@ -15,7 +15,7 @@ from django.test.utils import override_settings
 from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
 from opaque_keys.edx.keys import UsageKey
 from .views import send_notification
-from .utils import get_user_data
+from .utils import get_user_data, get_info_block_course
 import json
 
 class TestRequest(object):
@@ -489,3 +489,10 @@ class TestNotifiactionsDiscussion(UrlResetMixin, ModuleStoreTestCase):
         response=get_user_data('1234567890', self.student, self.course.id, self.block_key)
         response_data = json.loads(response)
         self.assertEqual(response_data['how_often'], 'daily')
+    
+    def test_utils_get_info_block_course_wrong_user_id(self):
+        """
+        Test error when user in notification is different from request user
+        """
+        info = get_info_block_course(self.discussion.id, 'course_test_wrong')
+        self.assertEqual(info, None)
