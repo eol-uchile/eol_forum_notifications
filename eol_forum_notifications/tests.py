@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
-
-from mock import patch
+# Python Standard Libraries
 from collections import namedtuple
-from django.test import Client
-from django.urls import reverse
-
-from common.djangoapps.util.testing import UrlResetMixin
-from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
-
-from xmodule.modulestore.tests.factories import CourseFactory
-from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
-from common.djangoapps.student.roles import CourseStaffRole
-from django.test.utils import override_settings
-from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
-from opaque_keys.edx.keys import UsageKey
-from .views import send_notification
-from .utils import get_user_data, get_info_block_course
 import json
+
+# Installed packages (via pip)
+from django.test import Client
+from django.test.utils import override_settings
+from django.urls import reverse
+from mock import patch
+
+# Edx dependencies
+from common.djangoapps.student.roles import CourseStaffRole
+from common.djangoapps.student.tests.factories import UserFactory, CourseEnrollmentFactory
+from common.djangoapps.util.testing import UrlResetMixin
+from opaque_keys.edx.keys import UsageKey
+from xmodule.modulestore.tests.django_utils import ModuleStoreTestCase
+from xmodule.modulestore.tests.factories import CourseFactory
+
+# Internal project dependencies
+from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
+from .utils import get_user_data, get_info_block_course
+from .views import send_notification
 
 class TestRequest(object):
     # pylint: disable=too-few-public-methods
