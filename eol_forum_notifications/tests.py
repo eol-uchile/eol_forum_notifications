@@ -5,6 +5,7 @@ import json
 
 # Installed packages (via pip)
 from django.contrib.auth.models import AnonymousUser
+from django.core.management.base import CommandError
 from django.http import HttpRequest, HttpResponse
 from django.test import Client
 from django.test.utils import override_settings
@@ -23,6 +24,10 @@ from xmodule.modulestore.tests.factories import CourseFactory
 from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
 from .utils import get_user_data, get_info_block_course, get_block_info
 from .views import send_notification, save_notification, save_notification_get, save_notification_post
+
+from django.core.management import call_command
+from django.test import TestCase
+from io import StringIO
 
 class TestRequest(object):
     # pylint: disable=too-few-public-methods
@@ -676,3 +681,22 @@ class TestNotifiactionsDiscussion(UrlResetMixin, ModuleStoreTestCase):
             'parent': "parent-id"
         }
         self.assertEqual(result, expected)
+
+
+class CommandTest(TestCase):
+    @patch('eol_forum_notifications.management.commands.discussion_notification.send_notification')
+    def test_command_discussion_notification(self,mock_send_notification):
+        """
+        Test discussion_notification
+            1. Without how_often
+            2. with wrong alternative to how_often
+            3. Normal process
+        """
+        mock_send_notification.return_value = True
+        out = StringIO()
+        with self.assertRaises(CommandError):
+            call_command('discussion_notification', stdout=out)
+        with self.assertRaises(CommandError) as cm:
+            call_command('discussion_notification','hourly', stdout=out)
+        self.assertIn("EolForumNoticationsCommand - how_often must be 'weekly' or 'daily'", str(cm.exception))
+        call_command('discussion_notification','daily', stdout=out)
