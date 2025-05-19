@@ -23,8 +23,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         logger.info('EolForumNoticationsCommand - Running send_notification()')
-        if not options['how_often']:
-            raise CommandError("EolForumNoticationsCommand - how_often must be specified")
         if options['how_often'] not in ['weekly', 'daily']:
             raise CommandError("EolForumNoticationsCommand - how_often must be 'weekly' or 'daily'")
         how_often = options['how_often']
