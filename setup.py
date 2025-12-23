@@ -14,5 +14,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     entry_points={
-        "lms.djangoapp": ["eol_forum_notifications = eol_forum_notifications.apps:EolForumNotificationsConfig"]},
+        "lms.djangoapp": ["eol_forum_notifications = eol_forum_notifications.apps:EolForumNotificationsConfig"],
+        "cms.djangoapp": ["eol_forum_notifications = eol_forum_notifications.apps:EolForumNotificationsConfig"]
+        },
 )
