@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.http import HttpResponse
 import openedx.core.djangoapps.django_comment_common.comment_client as cc
 from openedx.core.djangoapps.django_comment_common.utils import ThreadContext
-from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
+from eol_forum_notifications.models import EolForumNotificationsUser, EolForumNotificationsDiscussions
 from lms.djangoapps.courseware.courses import get_course_by_id
 from openedx.core.lib.courses import course_image_url
 from opaque_keys.edx.keys import CourseKey
