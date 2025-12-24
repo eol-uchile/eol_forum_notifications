@@ -19,6 +19,7 @@ from opaque_keys.edx.keys import CourseKey
 
 # Internal project dependencies
 from .models import EolForumNotificationsUser, EolForumNotificationsDiscussions
+from .tasks import task_send_single_email
 from .utils import get_users_notifications, get_courses_onlive, get_block_info, get_info_block_course
 
 logger = logging.getLogger(__name__)
@@ -148,7 +149,6 @@ def send_notification(how_often):
     """
         Send email with threads and/or comments unreaded
     """
-    from .tasks import task_send_single_email
     try:
         current_site = get_current_site()
         platform_name =  current_site.configuration.get_value('PLATFORM_NAME', settings.PLATFORM_NAME)
