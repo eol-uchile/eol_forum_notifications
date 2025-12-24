@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="eol_forum_notifications",
-    version="1.0.1",
+    version="1.0.2",
     author="Oficina EOL UChile",
     author_email="eol-ing@uchile.cl",
     description="Allows you to save forum notification and send mails with threads and/or comments unread among other things",
@@ -14,5 +14,7 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     entry_points={
-        "lms.djangoapp": ["eol_forum_notifications = eol_forum_notifications.apps:EolForumNotificationsConfig"]},
+        "lms.djangoapp": ["eol_forum_notifications = eol_forum_notifications.apps:EolForumNotificationsConfig"],
+        "cms.djangoapp": ["eol_forum_notifications = eol_forum_notifications.apps:EolForumNotificationsConfig"]
+        },
 )
