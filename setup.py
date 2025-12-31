@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="eol_forum_notifications",
-    version="1.0.3",
+    version="1.0.4",
     author="Oficina EOL UChile",
     author_email="eol-ing@uchile.cl",
     description="Allows you to save forum notification and send mails with threads and/or comments unread among other things",

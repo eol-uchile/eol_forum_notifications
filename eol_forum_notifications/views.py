@@ -15,6 +15,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 # Edx dependencies
+from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 from opaque_keys.edx.keys import CourseKey
 
 # Internal project dependencies
@@ -23,7 +24,8 @@ from .tasks import task_send_single_email
 from .utils import get_users_notifications, get_courses_onlive, get_block_info, get_info_block_course
 
 logger = logging.getLogger(__name__)
-msg_error = "contáctese al correo eol-ayuda@uchile.cl adjuntando el número del error"
+from_email = configuration_helpers.get_value('email_from_address', settings.DEFAULT_FROM_EMAIL)
+msg_error = f"contáctese al correo {from_email} adjuntando el número del error"
 
 def save_notification_get(request):
     """
